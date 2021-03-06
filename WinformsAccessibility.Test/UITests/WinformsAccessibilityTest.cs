@@ -9,9 +9,12 @@ namespace WinformsAccessibility.Test.UITests
     [TestFixture]
     public class WinformsAccessibilityTest
     {
-        [Test]
-        [Description("Tests that custom button control is accessible by a UI test. ValuePattern is available and TextAlign property can be read.")]
-        public void CustomButtonTest()
+        private Process _application;
+        private IUIAutomation _automation;
+        private IUIAutomationElement _mainWindow;
+
+        [SetUp]
+        public void SetUp()
         {
             var psi = new ProcessStartInfo(@".\..\..\..\..\WinformsAccessibility\bin\Debug\WinformsAccessibility.exe")
             {
@@ -19,24 +22,33 @@ namespace WinformsAccessibility.Test.UITests
             };
 
             // Start application
-            var application = Process.Start(psi);
+            _application = Process.Start(psi);
 
             // Wait for application main window
-            while (application.MainWindowHandle == IntPtr.Zero)
+            while (_application.MainWindowHandle == IntPtr.Zero)
             {
                 Thread.Sleep(100);
             }
 
             // Create UIAutomation (UIA3) entry point
-            var automation = new CUIAutomation8();
-            var mainWindow = automation.ElementFromHandle(application.MainWindowHandle);
+            _automation = new CUIAutomation8();
+            _mainWindow = _automation.ElementFromHandle(_application.MainWindowHandle);
+        }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _application.CloseMainWindow();
+            _application.WaitForExit();
+        }
+
+        [Test]
+        [Description("ValuePattern is available, current value and read-only state is available, button text can be changed.")]
+        public void TestThatCustomButtonControlHasValuePattern()
+        {
             // Find the custom button
-            var customButton = mainWindow.FindFirst(TreeScope.TreeScope_Children, automation.CreatePropertyCondition(UIA_PropertyIds.UIA_AutomationIdPropertyId, "customButtonId"));
+            var customButton = _mainWindow.FindFirst(TreeScope.TreeScope_Children, _automation.CreatePropertyCondition(UIA_PropertyIds.UIA_AutomationIdPropertyId, "customButtonId"));
             Assert.IsNotNull(customButton);
-
-            // Verify TextAlign
-            Assert.IsTrue(customButton.CurrentHelpText.Contains("TextAlign=MiddleCenter"));
 
             // Get Value pattern
             var valuePattern = customButton.GetCurrentPattern(UIA_PatternIds.UIA_ValuePatternId) as IUIAutomationValuePattern;
@@ -49,10 +61,18 @@ namespace WinformsAccessibility.Test.UITests
             // Set button text and verify
             valuePattern.SetValue("ModifiedText");
             Assert.AreEqual("ModifiedText", valuePattern.CurrentValue);
+        }
 
-            // Exit
-            application.CloseMainWindow();
-            application.WaitForExit();
+        [Test]
+        [Description("Custom button control has information about text alignment.")]
+        public void TestThatCustomButtonControlTextAlignStateCanBeRead()
+        {
+            // Find the custom button
+            var customButton = _mainWindow.FindFirst(TreeScope.TreeScope_Children, _automation.CreatePropertyCondition(UIA_PropertyIds.UIA_AutomationIdPropertyId, "customButtonId"));
+            Assert.IsNotNull(customButton);
+
+            // Verify TextAlign
+            Assert.IsTrue(customButton.CurrentHelpText.Contains("TextAlign=MiddleCenter"));
         }
     }
 }
