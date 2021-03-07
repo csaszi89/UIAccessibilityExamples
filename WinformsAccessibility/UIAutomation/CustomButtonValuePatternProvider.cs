@@ -35,7 +35,7 @@ namespace WinformsAccessibility.UIAutomation
         /// <param name="value">The text to set.</param>
         public void SetValue(string value)
         {
-            if (value == string.Empty)
+            if (string.IsNullOrEmpty(value))
             {
                 return;
             }
