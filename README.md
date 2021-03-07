@@ -3,4 +3,3 @@ Gives examples how to write server side UIAutomation providers for a custom cont
 
 NuGet Packages used:
 Client side: Interop.UIAutomationClient.dll; NUnit; NUnit3TestAdapter
-
