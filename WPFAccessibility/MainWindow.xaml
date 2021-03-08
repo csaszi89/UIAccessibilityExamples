@@ -8,6 +8,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <CustomControls:CustomButton Content="CustomButtonText" HorizontalAlignment="Left" Margin="329,185,0,0" VerticalAlignment="Top" Width="116" Height="41"/>
+        <CustomControls:CustomButton Content="CustomButtonText" HorizontalAlignment="Left" Margin="329,185,0,0" VerticalAlignment="Top" Width="116" Height="41" AutomationProperties.AutomationId="customButtonId"/>
     </Grid>
 </Window>
